@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+	.on-button {
+		background-color: red;
+		border: none;
+		color: white;
+		padding: 15px 30px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 30px;
+		margin: 4px 2px;
+		cursor: pointer;
+	}
+	
+	.off-button {
+		background-color: blue;
+		border: none;
+		color: white;
+		padding: 15px 30px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 30px;
+		margin: 4px 2px;
+		cursor: pointer;
+	}
+	
+	h2 {
+		color : blue;
+	}
+	
+</style>
+
+</head>
+<body>
+	<h1 id="h1test">FireBaseTest</h1>
+	
+	<!-- 정렬을 위해 TABLE 사용  -->
+	<table>
+	<tr>
+		<h2 id = "text">LED STATUS : OFF</h2>
+	</tr>
+	<tr>
+		<td>
+			<button class="on-button" id="onBtn">LED ON</button>
+			<button class="off-button" id="offBtn">LED OFF</button>
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+		<br><br><br>
+			<img id = 'img' src = "./img/lightoff.jpg"/>
+		</td>
+	</tr>
+	
+	</table>
+
+	<script type="module">
+	// Import the functions you need from the SDKs you need
+		import { initializeApp } from "https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js";
+		import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.5.0/firebase-analytics.js";
+		import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.5.0/firebase-database.js";
+	// TODO: Add SDKs for Firebase products that you want to use
+	// https://firebase.google.com/docs/web/setup#available-libraries
+	// Your web app's Firebase configuration
+	// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+		const firebaseConfig = {
+			apiKey: "AIzaSyDgGGaPk71YNoyZI_krp_P-XFIG5ghvZIA",
+			authDomain: "hello-fb-19b8f.firebaseapp.com",
+			databaseURL: "https://hello-fb-19b8f-default-rtdb.firebaseio.com",
+			projectId: "hello-fb-19b8f",
+			storageBucket: "hello-fb-19b8f.appspot.com",
+			messagingSenderId: "636199377364",
+			appId: "1:636199377364:web:73a25634479e7e207f5e41",
+			measurementId: "G-XPGLKGJ1WG"
+		};
+	// Initialize Firebase
+
+		const app = initializeApp(firebaseConfig);
+		const analytics = getAnalytics(app);
+		const db = getDatabase(app);
+	
+		console.log(db);
+	
+		var OnButton = document.getElementById("onBtn");
+		OnButton.addEventListener("click", onBtnClick, false);
+	
+		var OffButton = document.getElementById("offBtn");
+		OffButton.addEventListener("click", offBtnClick, false);
+		
+		//on버튼을 눌렀을때 작동하는 함수
+		function onBtnClick(event) {
+			set(ref(db, 'LED_STATUS'), 'ON');
+			console.log("LED ON");
+			document.getElementById("img").src = "./img/lighton.jpg";
+			document.getElementById("text").innerText = "LED STATUS : ON";
+			document.getElementById("text").style.color = "red";
+		}
+		//off버튼을 눌렀을때 작동하는 함수
+		function offBtnClick() {
+			set(ref(db, 'LED_STATUS'), 'OFF');
+			console.log("LED OFF");
+			document.getElementById("img").src = "./img/lightoff.jpg";
+			document.getElementById("text").innerText = "LED STATUS : OFF";
+			document.getElementById("text").style.color = "blue";
+		}
+		//snapshot을 이용해 다른 장치에서 변경하여도 그 값을 받아와서 상태 변경
+		const dbRef = ref(db, 'LED_STATUS');
+		onValue(dbRef, (snapshot) => {
+			console.log(snapshot.val());
+			document.getElementById("text").innerText = 'LED STATUS : ' + snapshot.val();
+			if(snapshot.val() == "ON") {
+				document.getElementById("text").style.color = "red";
+				document.getElementById("img").src = "./img/lighton.jpg";
+			} else {
+				document.getElementById("text").style.color = "blue";
+				document.getElementById("img").src = "./img/lightoff.jpg";
+			}
+		})
+
+</script>
+</body>
+</html>
